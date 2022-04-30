@@ -1,10 +1,10 @@
 const express = require('express');
 const itemRouter = express.Router();
 const asyncHandler = require('express-async-handler')
+//calling from schema created
 const Item = require('../model/itemModel')
 
-const itemId = Item.id;
-//these handle the routes for get, post, put, delete and they are used with the itemCOntroller file to simplify the files
+//these handle the routes for get, post, put, delete and they are used with the itemController file to simplify the files
 itemRouter.route('/')
 .get(asyncHandler(async(req, res) =>{
     //we are wanting to get the items from the database and find them to display
@@ -13,23 +13,20 @@ itemRouter.route('/')
     res.status(200).json(items)
 }))
 
-.post(asyncHandler(async (req, res) =>{
-    
-    if(!req.body.name) {
+.post(asyncHandler(async (req, res, next) =>{
+    if(!req.body) {
         res.status(400).json({message: "Please fill out information" })
     }
-try{
-    const item = await Item.create(
+    Item.create(
         req.body
     )
-
-    res.status(200).json(item)
-} catch(err){
-    res.status(400).json({message: err.message})
-}
+    .then(item =>{
+    res.status(200).json(item)}
+)
+.catch(err => next(err));
 }))
 
-itemRouter.put('/:id', asyncHandler(async(req, res) =>{
+itemRouter.put('/:id', asyncHandler(async(req, res, next) =>{
     Item.findByIdAndUpdate(req.params.id, {
         $set: req.body
     }, { new: true })
@@ -39,7 +36,7 @@ itemRouter.put('/:id', asyncHandler(async(req, res) =>{
     .catch(err => next(err));
 }))
 
-itemRouter.delete('/:id', asyncHandler(async(req, res) =>{
+itemRouter.delete('/:id', asyncHandler(async(req, res, next) =>{
     Item.findByIdAndDelete(req.params.id)
     .then(response =>{
         res.status(200).json(response)

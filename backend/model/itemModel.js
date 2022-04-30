@@ -14,9 +14,6 @@ const itemSchema = new Schema({
     amount: {
         type: Number,
         required:true
-    },
-    image: {
-        type: String
     }
 })
 
